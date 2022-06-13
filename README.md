@@ -10,8 +10,17 @@
 在你需要侧滑的viewController中实现下面代码(也可以放基类中)
 
 ```objective-c
-SwipBackManager *swipBackManager = [[SwipBackManager alloc]initWithController:self];
-[swipBackManager invalid];
+self.swipBackManager = [[SwipBackManager alloc]initWithController:self];
+[_swipBackManager invalid];
+```
+
+注意，这里是关闭了系统的手势滑动功能
+
+```objective-c
+// 关闭 侧滑
+if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
+          self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+}
 ```
 
 
