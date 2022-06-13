@@ -22,4 +22,4 @@ SwipBackManager *swipBackManager = [[SwipBackManager alloc]initWithController:se
 
 
 
-![swipeBack](/SwipeBack/swipeBack.gif)
+![swipeBack](/swipeBack.gif)
