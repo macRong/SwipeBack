@@ -29,9 +29,6 @@ if ([self.navigationController respondsToSelector:@selector(interactivePopGestur
 
 
 
-#### 后期继续优化
-
-根据协议方式继续完善。
 
 
 
