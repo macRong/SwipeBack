@@ -13,19 +13,20 @@
     CGFloat _backShowImageViewHeight;
 }
 
+@property (nonatomic, strong) UIScreenEdgePanGestureRecognizer *leftEdgeGesture;
 @property (nonatomic, strong) UIView *view;
-@property (nonatomic, weak, readonly) UIViewController *viewController;
+@property (nonatomic, weak, readonly) UIResponder *responder;
 @property (nonatomic, strong) UIImageView *backShowImageView;
 
 @end
 
 @implementation SwipBackManager
 
-- (instancetype)initWithController:(UIViewController *)vc
+- (instancetype)initResponder:(UIResponder *)responder;
 {
     self = [super init];
     if (self) {
-        _viewController = vc;
+        _responder = responder;
         
         [self initVars];
         [self initViews];
@@ -42,20 +43,19 @@
 
 - (void)initViews
 {
-     UIScreenEdgePanGestureRecognizer *leftEdgeGesture =
+     self.leftEdgeGesture =
      [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self
                                                        action:@selector(handleLeftEdgeGesture:)];
-     leftEdgeGesture.edges = UIRectEdgeLeft;
-     [self.view addGestureRecognizer:leftEdgeGesture];
+     _leftEdgeGesture.edges = UIRectEdgeLeft;
+     [self.view addGestureRecognizer:_leftEdgeGesture];
      [self.view addSubview:self.backShowImageView];
 //    [[UIApplication sharedApplication].delegate.window addSubview:self.backShowImageView];
 }
 
 - (void)handleLeftEdgeGesture:(UIScreenEdgePanGestureRecognizer *)gesture
 {
-    ///如果当前不是push过的不要处理
-    if (![_viewController isKindOfClass:[UIViewController class]] &&
-          [self.viewController.navigationController childViewControllers].count > 1) {
+    BOOL isvalidGoBack = [self isvalidGoback];
+    if (!isvalidGoBack) {
         return;
     }
     
@@ -100,18 +100,48 @@
     return YES;
 }
 
-- (void)invalid
+- (BOOL)isvalidProtocol
 {
-   ///这里是伪调用
+    if (!self.invalid &&
+        [self isValidPush] &&
+        [_responder conformsToProtocol:@protocol(SwipeBackProtocol)] &&
+        [_responder respondsToSelector:@selector(swipBackAction)]) {
+        
+        return YES;
+    }
+
+    return NO;
+}
+
+- (BOOL)isvalidForceProtocol
+{
+    if (!self.invalid &&
+        [_responder conformsToProtocol:@protocol(SwipeBackProtocol)] &&
+        [_responder respondsToSelector:@selector(swipForceBackAction)]) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (void)fakeCompile
+{
+   ///这里是伪调用，（懒加载）也可以不用
 }
 
 - (void)backHome
 {
-    if (![_viewController isKindOfClass:[UIViewController class]]) {
+    if ([self isvalidProtocol]) {
+        SwipeBackProtocolCompile *protocolCompile = (SwipeBackProtocolCompile *)_responder;
+        if(protocolCompile) [protocolCompile swipBackAction];
         return;
     }
     
-    [self.viewController.navigationController popViewControllerAnimated:YES];
+    if ([self isvalidForceProtocol]) {
+        SwipeBackProtocolCompile *protocolCompile = (SwipeBackProtocolCompile *)_responder;
+        if(protocolCompile) [protocolCompile swipForceBackAction];
+        return;
+    }
 }
 
 - (void)resetBackViewStatus
@@ -124,13 +154,63 @@
     _backShowImageView.hidden = YES;
 }
 
-- (UIView *)view
+- (BOOL)isvalidGoback
 {
-    if (![_viewController isKindOfClass:[UIViewController class]]) {
-        return nil;
+    if ([self isvalidProtocol] || [self isvalidForceProtocol]) {
+        return YES;
     }
     
-    _view = self.viewController.view;
+    return NO;
+}
+
+- (BOOL)isValidPush
+{
+    if (_responder && [_responder isKindOfClass:[UIView class]]) {
+            
+        ///增加view的一些滑动判断条件
+        ///Todo
+        return YES;
+    }
+    
+    if (_responder && [_responder isKindOfClass:[UIViewController class]]) {
+        UIViewController *viewController = (UIViewController *)_responder;
+        return [viewController.navigationController childViewControllers].count > 1;
+    }
+    
+    return NO;
+}
+
+- (void)setInvalid:(BOOL)invalid
+{
+    _invalid = invalid;
+    
+    if (!_leftEdgeGesture || !self.view) {
+        return;
+    }
+    
+    if(invalid) { ///无效就删除
+        [self.view removeGestureRecognizer:_leftEdgeGesture];
+    }else {
+        if (![[self.view gestureRecognizers] containsObject:_leftEdgeGesture]) {
+            [self.view addGestureRecognizer:_leftEdgeGesture];
+        }
+    }
+}
+
+- (UIView *)view
+{
+    if (_responder && [_responder isKindOfClass:[UIViewController class]]) {
+        UIViewController *viewController = (UIViewController *)_responder;
+        _view = viewController.view;
+        return _view;
+    }
+    
+    if (_responder && [_responder isKindOfClass:[UIView class]]) {
+        _view = (UIView *)_responder;
+        return _view;
+    }
+    
+    _view = nil;
     
     return _view;
 }
@@ -148,3 +228,4 @@
 }
 
 @end
+

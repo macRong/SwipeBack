@@ -9,17 +9,17 @@
 
 在你需要侧滑的viewController中实现下面代码(也可以放基类中)
 
-```objective-c
-self.swipBackManager = [[SwipBackManager alloc]initWithController:self];
-[_swipBackManager invalid];
-```
+1. 实现协议SwipBackProtocol
+2. `self.backManager = [[SwipBackManager alloc]initResponder:self];         [self.backManager fakeCompile];`
+3. 实现代理swipBackAction，在此方法中实现返回的逻辑（等同点击按钮事件）
+4. 如果一个页面在A情况可支持手势，在B情况不支持手势，可以用self.backManager.invalid = YES; Or NO 关闭或开启侧滑
 
 注意，这里是关闭了系统的手势滑动功能
 
 ```objective-c
 // 关闭 侧滑
 if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
-          self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+		self.navigationController.interactivePopGestureRecognizer.enabled = NO;
 }
 ```
 

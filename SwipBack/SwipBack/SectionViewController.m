@@ -6,11 +6,12 @@
 //
 
 #import "SectionViewController.h"
-#import "SwipBackManager.h"
+#import "CustomView.h"
 
 @interface SectionViewController ()
 
 @property (nonatomic, strong) SwipBackManager *swipBackManager;
+@property (nonatomic, strong) CustomView *cutomView;
 
 @end
 
@@ -21,18 +22,43 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    self.swipBackManager = [[SwipBackManager alloc]initWithController:self];
-    [_swipBackManager invalid];
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn.frame = CGRectMake(150, 200, 160, 30);
+    [btn addTarget:self action:@selector(viewAction) forControlEvents:UIControlEventTouchUpInside];
+    [btn setTitle:@"弹窗view" forState:UIControlStateNormal];
+    [btn setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+    [self.view addSubview:btn];
+    
+    self.swipBackManager = [[SwipBackManager alloc]initResponder:self];
+    [_swipBackManager fakeCompile];
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)swipBackAction
+{
+    [self goBack];
 }
-*/
+
+- (void)goBack
+{
+    NSLog(@"====自定义事件");
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)viewAction
+{
+//    [[UIApplication sharedApplication].delegate.window  addSubview:self.cutomView];
+    [self.view.window  addSubview:self.cutomView];
+
+}
+
+- (UIView *)cutomView
+{
+    if (!_cutomView) {
+        _cutomView = [[CustomView alloc]initWithFrame:[UIScreen mainScreen].bounds];
+        _cutomView.backgroundColor = [UIColor  colorWithWhite:0 alpha:0.7];
+    }
+    
+    return _cutomView;
+}
 
 @end
