@@ -67,9 +67,12 @@
        UIGestureRecognizerStateChanged == gesture.state)
     {
         if (_backShowImageView.frame.origin.x != 0) {
+            BOOL isScreenheight = CGRectGetHeight(self.view.frame) < [UIScreen mainScreen].bounds.size.height;
+            CGFloat fixViewScreenHeight = isScreenheight ? -_backShowImageViewHeight/2 : _backShowImageViewHeight/2;
+            
             CGRect rect = _backShowImageView.frame;
             rect.origin.x = 0;
-            rect.origin.y = point.y-_backShowImageViewHeight/2;
+            rect.origin.y = point.y-fixViewScreenHeight;
             _backShowImageView.frame = rect;
             _backShowImageView.hidden = NO;
         }

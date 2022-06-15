@@ -33,6 +33,6 @@ if ([self.navigationController respondsToSelector:@selector(interactivePopGestur
 
 根据协议方式继续完善。
 
-
+![swipeBackDemo](/swipeBackDemo.gif)
 
 ![swipeBack](/swipeBack.gif)
