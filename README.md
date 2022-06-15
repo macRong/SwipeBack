@@ -7,7 +7,7 @@
 
 ### 如何使用？
 
-在你需要侧滑的viewController中实现下面代码(也可以放基类中)
+在你需要侧滑的Responder(viewController或view)中实现下面代码(也可以放基类中)
 
 ```
 1. 实现协议SwipBackProtocol
@@ -29,9 +29,6 @@ if ([self.navigationController respondsToSelector:@selector(interactivePopGestur
 
 
 
-#### 后期继续优化
-
-根据协议方式继续完善。
 
 ![swipeBackDemo](/swipeBackDemo.gif)
 
