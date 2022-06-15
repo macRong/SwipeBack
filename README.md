@@ -30,6 +30,4 @@ if ([self.navigationController respondsToSelector:@selector(interactivePopGestur
 
 
 
-![swipeBackDemo](/swipeBackDemo.gif)
-
-![swipeBack](/swipeBack.gif)
+![swipeBackDemo](/swipeBackDemo.gif)![swipeBack](/swipeBack.gif)
