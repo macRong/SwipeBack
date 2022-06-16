@@ -27,7 +27,7 @@
 ```objective-c
 // 关闭 侧滑
 if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
-		self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+	self.navigationController.interactivePopGestureRecognizer.enabled = NO;
 }
 ```
 
