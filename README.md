@@ -13,10 +13,12 @@
 
 在你需要侧滑的Responder(viewController或view)中实现下面代码(也可以放基类中)
 
+```
 1. 实现协议SwipBackProtocol
-2. `self.backManager = [[SwipBackManager alloc]initResponder:self]; `  `[self.backManager fakeCompile];`
+2. self.backManager = [[SwipBackManager alloc]initResponder:self];   [self.backManager fakeCompile];
 3. 实现代理swipBackAction，在此方法中实现返回的逻辑（等同点击按钮事件）
-4. 如果一个页面在A情况可支持手势，在B情况不支持手势，可以用`self.backManager.invalid = YES; `Or NO 关闭或开启侧滑
+4. 如果一个页面在A情况可支持手势，在B情况不支持手势，可以用self.backManager.invalid = YES; Or NO 关闭或开启侧滑
+```
 
 
 
@@ -29,7 +31,7 @@ if ([self.navigationController respondsToSelector:@selector(interactivePopGestur
 }
 ```
 
-
+## Sam
 
 
 ![swipeBackDemo](/swipeBackDemo.gif)![swipeBack](/swipeBack.gif)
