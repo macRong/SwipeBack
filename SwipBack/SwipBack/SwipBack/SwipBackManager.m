@@ -14,13 +14,30 @@
 }
 
 @property (nonatomic, strong) UIScreenEdgePanGestureRecognizer *leftEdgeGesture;
-@property (nonatomic, strong) UIView *view;
+@property (nonatomic, weak) UIView *view;
 @property (nonatomic, weak, readonly) UIResponder *responder;
 @property (nonatomic, strong) UIImageView *backShowImageView;
 
 @end
 
 @implementation SwipBackManager
+
+- (void)dealloc
+{
+    [self destruct];
+}
+
+- (void)destruct
+{
+    if (_backShowImageView) {
+        [_backShowImageView removeFromSuperview];
+        _backShowImageView = nil;
+    }
+    
+    if (_view && _leftEdgeGesture) {
+        [_view removeGestureRecognizer:_leftEdgeGesture];
+    }
+}
 
 - (instancetype)initResponder:(UIResponder *)responder;
 {
@@ -43,33 +60,36 @@
 
 - (void)initViews
 {
-     self.leftEdgeGesture =
-     [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self
-                                                       action:@selector(handleLeftEdgeGesture:)];
-     _leftEdgeGesture.edges = UIRectEdgeLeft;
-     [self.view addGestureRecognizer:_leftEdgeGesture];
-     [self.view addSubview:self.backShowImageView];
-//    [[UIApplication sharedApplication].delegate.window addSubview:self.backShowImageView];
+    if ([self isvalidGoback]) {
+         _leftEdgeGesture =
+         [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:self
+                                                           action:@selector(handleLeftEdgeGesture:)];
+         _leftEdgeGesture.edges = UIRectEdgeLeft;
+         [self.view addGestureRecognizer:_leftEdgeGesture];
+         [self.view addSubview:self.backShowImageView];
+    //    [[UIApplication sharedApplication].delegate.window addSubview:self.backShowImageView];
+    }
 }
 
 - (void)handleLeftEdgeGesture:(UIScreenEdgePanGestureRecognizer *)gesture
 {
-    BOOL isvalidGoBack = [self isvalidGoback];
-    if (!isvalidGoBack) {
+    if (self.invalid || ![self isvalidGoback]) {
         return;
     }
+    
     
 //    UIView *view = [self.view hitTest:[gesture locationInView:gesture.view]
 //                            withEvent:nil];
 
     CGPoint point = [gesture locationInView:gesture.view];
-    if(UIGestureRecognizerStateBegan == gesture.state ||
-       UIGestureRecognizerStateChanged == gesture.state)
+    if(gesture.state == UIGestureRecognizerStateBegan ||
+       gesture.state == UIGestureRecognizerStateChanged)
     {
         if (_backShowImageView.frame.origin.x != 0) {
-            BOOL isScreenheight = CGRectGetHeight(self.view.frame) < [UIScreen mainScreen].bounds.size.height;
-            CGFloat fixViewScreenHeight = isScreenheight ? -_backShowImageViewHeight/2 : _backShowImageViewHeight/2;
+            CGFloat screenHeight =  [UIScreen mainScreen].bounds.size.height;
             
+            CGFloat viewDistanceHeight = screenHeight - CGRectGetHeight(self.view.frame);
+            CGFloat fixViewScreenHeight = CGRectGetHeight(self.view.frame) < screenHeight ? viewDistanceHeight-_backShowImageViewHeight/2 : _backShowImageViewHeight/2;
             CGRect rect = _backShowImageView.frame;
             rect.origin.x = 0;
             rect.origin.y = point.y-fixViewScreenHeight;
@@ -77,7 +97,7 @@
             _backShowImageView.hidden = NO;
         }
         
-        _backShowImageView.alpha = [self invalidSwipeGesture:gesture] ? 0.6 :0.3;
+        _backShowImageView.alpha = [self invalidSwipeGesture:gesture] ? 0.4 :0.2;
     }else {
         [self resetBackViewStatus];
         if ([self invalidSwipeGesture:gesture]) {
@@ -99,14 +119,9 @@
     return NO;
 }
 
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    return YES;
-}
-
 - (BOOL)isvalidProtocol
 {
-    if (!self.invalid &&
-        [self isValidPush] &&
+    if ([self isValidPush] &&
         [_responder conformsToProtocol:@protocol(SwipeBackProtocol)] &&
         [_responder respondsToSelector:@selector(swipBackAction)]) {
         
@@ -118,8 +133,7 @@
 
 - (BOOL)isvalidForceProtocol
 {
-    if (!self.invalid &&
-        [_responder conformsToProtocol:@protocol(SwipeBackProtocol)] &&
+    if ([_responder conformsToProtocol:@protocol(SwipeBackProtocol)] &&
         [_responder respondsToSelector:@selector(swipForceBackAction)]) {
         return YES;
     }
@@ -135,14 +149,18 @@
 - (void)backHome
 {
     if ([self isvalidProtocol]) {
-        SwipeBackProtocolCompile *protocolCompile = (SwipeBackProtocolCompile *)_responder;
+        id<SwipeBackProtocol> protocolCompile = (id<SwipeBackProtocol>)_responder;
         if(protocolCompile) [protocolCompile swipBackAction];
+        
+        [self destruct];
         return;
     }
     
     if ([self isvalidForceProtocol]) {
-        SwipeBackProtocolCompile *protocolCompile = (SwipeBackProtocolCompile *)_responder;
+        id<SwipeBackProtocol> protocolCompile = (id<SwipeBackProtocol>)_responder;
         if(protocolCompile) [protocolCompile swipForceBackAction];
+        
+        [self destruct];
         return;
     }
 }
@@ -153,7 +171,7 @@
         return;
     }
     
-    _backShowImageView.frame = CGRectMake(-25, 100, 25, _backShowImageViewHeight);
+    _backShowImageView.frame = CGRectMake(-30, 100, 30, _backShowImageViewHeight);
     _backShowImageView.hidden = YES;
 }
 

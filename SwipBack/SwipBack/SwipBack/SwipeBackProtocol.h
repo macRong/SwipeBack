@@ -24,13 +24,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-/** 用户编译时期，伪调用 */
-@interface SwipeBackProtocolCompile
-
-- (void)swipBackAction;
-- (void)swipForceBackAction;
-
-@end
-
-
 NS_ASSUME_NONNULL_END
