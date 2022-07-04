@@ -5,7 +5,7 @@
 
 ## Feature
 
-1. iOS侧滑返回（类似Android系统）
+1. iOS侧滑返回（类似Android系统返回）
 2. 自定义侧滑返回策略
 3. 快速添加侧滑返回功能
 
@@ -27,7 +27,7 @@
 ```objective-c
 // 关闭 侧滑
 if ([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)]) {
-		self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+	self.navigationController.interactivePopGestureRecognizer.enabled = NO;
 }
 ```
 
