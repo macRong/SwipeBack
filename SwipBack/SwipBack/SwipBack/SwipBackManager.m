@@ -152,7 +152,7 @@
         id<SwipeBackProtocol> protocolCompile = (id<SwipeBackProtocol>)_responder;
         if(protocolCompile) [protocolCompile swipBackAction];
         
-        [self destruct];
+//        [self destruct];
         return;
     }
     
@@ -160,7 +160,7 @@
         id<SwipeBackProtocol> protocolCompile = (id<SwipeBackProtocol>)_responder;
         if(protocolCompile) [protocolCompile swipForceBackAction];
         
-        [self destruct];
+//        [self destruct];
         return;
     }
 }
